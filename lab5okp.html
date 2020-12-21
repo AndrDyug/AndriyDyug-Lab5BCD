@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+<link rel="stylesheet" type="text/css" href="absolute.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>	
+<div class="box violet one" id="one"><p>vsbdlhkjxz</p></div>
+<div class="box green two" id="two"><p id="two">Right part</p></div>
+<div class="box orange three" id="three"><p id="three">Left part (can be as a navigation menu)</p></div>
+<div class="box orange four" id="four">
+ <button onclick="play_work()">Play</button>
+  
+</div>
+<div class="box white five" id="five">
+  <div id="work">
+        <div id="controls">
+            <div id="controls_btns">
+                <input type="submit" value="close" id="btn_close" onclick="close_work()">
+                <input type="submit" value="start" id="btn_start" onclick="start_anim()">
+                <input type="submit" value="stop" id="btn_stop" onclick="stop_anim()">
+                <input type="submit" value="reload" id="btn_reload" onclick="reload_anim()">
+            </div>
+            <div id="controlls">
+                Події відсутні
+            </div>
+        </div>
+        <div id="anim">
+            <div class="ball" id="ball"></div>
+        </div>
+    </div>
+    <div id="events">
+  </div>
+</div>
+<div class="box violet six" id="six">dtcfh</div>
+<div class="box white x" id="x">Position:</div>
+<div class="box white y" id="y"><p>Copyright</p></div>
+
+  
+<script type="text/javascript">
+
+let block = document.getElementById("ball");
+let currentX = 0;
+let currentY = 0;
+let storageNum = 0;
+let stop = true;
+let reload = false;
+let dx = randomInteger(1, 6);
+let dy = randomInteger(1, 6);
+localStorage.clear();
+let num = 1;
+let ball_out = false
+
+function toStorage(message) {
+
+    localStorage.setItem(storageNum, (new Date()).toLocaleTimeString() + " - " + message);
+    storageNum++;
+}
+
+function hide(element) {
+    document.getElementById(element).style.top = "-9999px";
+    document.getElementById(element).style.left = "-9999px";
+
+}
+
+function show(element) {
+    document.getElementById(element).style.top = 0;
+    document.getElementById(element).style.left = 0;
+}
+
+function play_work() {
+    localStorage.clear();
+    console.log("play")
+    show("work");
+
+    document.getElementById("controlls").innerHTML = 'Показано work';
+    toStorage('Показано work');
+
+}
+
+function start_anim() {
+    document.getElementById("controlls").innerHTML = "Start";
+    toStorage('Start');
+    stop = false;
+    move(block, 10);
+    hide("btn_start");
+    show("btn_stop");
+}
+
+function stop_anim() {
+    document.getElementById("controlls").innerHTML = "Stop";
+    toStorage('Stop');
+    stop = true;
+    hide("btn_stop");
+    show("btn_start");
+}
+
+function reload_anim() {
+    document.getElementById("controlls").innerHTML = "Reload";
+    toStorage('Reload');
+    block.style.top = 0;
+    block.style.left = 0;
+    dx = randomInteger(1, 4);
+    dy = randomInteger(1, 4);
+    stop = true;
+    hide("btn_reload");
+    show("btn_start");
+    ball_out = false
+}
+
+function randomInteger(min, max) {
+    let rand = min + Math.random() * (max + 1 - min);
+    return Math.floor(rand);
+}
+
+function close_work() {
+
+    hide("work");
+    document.getElementById("controlls").textContent = 'Заховано work';
+    toStorage('Заховано work');
+
+    let key_array = [];
+    let myMap = new Map();
+
+    for (let i = 0, len = localStorage.length; i < len; i++) {
+        let key = localStorage.key(i);
+        let value = localStorage[key];
+        myMap.set(key * 1, value);
+        key_array.push(key * 1);
+    }
+    key_array.sort((a, b) => a - b);
+    console.log(myMap)
+    console.log(key_array)
+    document.getElementById("events").innerHTML += "--- <b>" + num++ + "</b>---<br>";
+    key_array.forEach(element => {
+        document.getElementById("events").innerHTML += myMap.get(element) + "<br>"
+    });
+}
+function move(element, delay) {
+
+    let x = parseInt(element.style.left, 10);
+    let y = parseInt(element.style.top, 10);
+
+    x = isNaN(x) ? 0 : x;
+    y = isNaN(y) ? 0 : y;
+    let r = parseInt($(element).width()) / 2;
+    if (stop) {
+        return
+    }
+
+    if (x + r + dx < $(document.getElementById('anim')).width()) {
+        if (x + r + dx < 0) {
+            dx = -dx;
+            document.getElementById("controlls").innerHTML = "Зіткнення зі стінкою";
+            hide("btn_stop");
+        show("btn_reload");
+            toStorage("Зіткнення зі стінкою");
+        }
+        if (y + r + dy > $(document.getElementById('anim')).height() || y + r + dy < 0) {
+            dy = -dy;
+            document.getElementById("controlls").innerHTML  = "Зіткнення зі стінкою";
+            hide("btn_stop");
+        show("btn_reload");
+            toStorage("Зіткнення зі стінкою");
+        }
+    } else if (!ball_out) {
+
+        hide("btn_stop");
+        show("btn_reload");
+        document.getElementById("controlls").innerHTML = 'Куля вилетіла за межі anim';
+        toStorage('Куля вилетіла за межі anim');
+        ball_out = true;
+    }
+    element.style.left = x + dx + "px";
+    element.style.top = y + dy + "px";
+    setTimeout(function() {
+        move(element, delay);
+    }, delay)
+}
+</script>
+</body>
+</html>

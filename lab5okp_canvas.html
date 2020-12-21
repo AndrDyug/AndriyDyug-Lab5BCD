@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+<link rel="stylesheet" type="text/css" href="absolute.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>	
+<div class="box violet one" id="one"><p>vsbdlhkjxz</p></div>
+<div class="box green two" id="two"><p id="two">Right part</p></div>
+<div class="box orange three" id="three"><p id="three">Left part (can be as a navigation menu)</p></div>
+<div class="box orange four" id="four">
+ <button onclick="play_work()">Play</button>
+  
+</div>
+<div class="box white five" id="five">
+ <div id="work">
+        <div id="controls">
+            <div id="controls_btns">
+                <input type="submit" value="close" id="btn_close" onclick="close_work()">
+                <input type="submit" value="start" id="btn_start" onclick="start_anim()">
+                <input type="submit" value="stop" id="btn_stop" onclick="stop_anim()">
+                <input type="submit" value="reload" id="btn_reload" onclick="reload_anim()">
+            </div>
+            <div id="controls_info">
+                Події відсутні
+            </div>
+        </div>
+        <div id="anim">
+            <canvas id="canvas"></canvas>
+        </div>
+    </div>
+    <div id="events">
+
+    </div>
+</div>
+<div class="box violet six" id="six">dtcfh</div>
+<div class="box white x" id="x">Position:</div>
+<div class="box white y" id="y"><p>Copyright</p></div>
+
+  
+<script type="text/javascript">
+
+let stop = true;
+let reload = false;
+let firsttime = true
+let x = 7.5;
+let y = 7.5;
+let storageNum = 0;
+let prevX = x;
+let prevY = y;
+
+let r = 7.5;
+let dx = randomInteger(1, 6);
+let dy = randomInteger(1, 6);
+let dx_bool = false;
+let dy_bool = false;
+localStorage.clear();
+let num = 1;
+let ball_out = false
+
+let canvas = document.getElementById("canvas");
+let cont = canvas.getContext('2d');
+width = canvas.width = $(document.getElementById('anim')).width();
+height = canvas.height = $(document.getElementById('anim')).height();
+
+function hide(element) {
+    document.getElementById(element).style.top = "-9999px";
+    document.getElementById(element).style.left = "-9999px";
+
+}
+
+function show(element) {
+    document.getElementById(element).style.top = 0;
+    document.getElementById(element).style.left = 0;
+}
+
+function draw() {
+    console.log($(document.getElementById("anim")).offset().top);
+    cont.fillStyle = 'green';
+    cont.beginPath();
+    drawBall(x, y);
+}
+
+function toStorage(message) {
+
+    localStorage.setItem(storageNum, (new Date()).toLocaleTimeString() + " - " + message);
+    storageNum++;
+}
+
+function drawBall(x, y) {
+    cont.beginPath();
+    cont.fillStyle = 'green';
+    cont.arc(x, y, r, 0, 2 * Math.PI);
+    console.log(x + ":" + y)
+    cont.fill();
+    cont.closePath();
+}
+
+function loop() {
+
+    if (stop) { return }
+    cont.clearRect(prevX - r, prevY - r, r * 2, r * 2);
+
+    drawBall(x, y);
+    console.log(dx + ":" + dy)
+    if (x + dx < $(document.getElementById('anim')).width() - r) {
+        if (x + dx < r) {
+            dx = -dx;
+            document.getElementById("controls_info").innerHTML = "Зіткнення зі стінкою";
+            hide("btn_stop");
+            show("btn_reload");
+            toStorage("Зіткнення зі стінкою");
+        }
+        if (y + dy > $(document.getElementById('anim')).height() - r || y + dy < r) {
+            dy = -dy;
+            document.getElementById("controls_info").innerHTML = "Зіткнення зі стінкою";
+            hide("btn_stop");
+            show("btn_reload");
+            toStorage("Зіткнення зі стінкою");
+        }
+    } else if (!ball_out) {
+
+        hide("btn_stop");
+        show("btn_reload");
+        document.getElementById("controls_info").innerHTML = 'Виліт за межі anim';
+        toStorage('Виліт за межі anim');
+        ball_out = true;
+    }
+    prevX = x
+    prevY = y
+    x += dx;
+    y += dy;
+    setTimeout(function() {
+        loop();
+    }, 10)
+}
+
+function play_work() {
+
+    document.getElementById("canvas").style.top = 0 + "px";
+    document.getElementById("canvas").style.left = 0 + "px";
+    localStorage.clear();
+    console.log("play")
+    show("work");
+
+    draw()
+    document.getElementById("controls_info").innerHTML = 'Показано work';
+    toStorage('Показано work');
+}
+
+function start_anim() {
+    stop = false;
+    canvas.width = $(document.getElementById('anim')).width(); 
+    canvas.height = $(document.getElementById('anim')).height();
+    loop();
+    hide("btn_start");
+    show("btn_stop");
+    document.getElementById("controls_info").innerHTML = "Start";
+    toStorage('Start');
+
+}
+
+function stop_anim() {
+    document.getElementById("controls_info").innerHTML = "Stop";
+    toStorage('Stop');
+    stop = true;
+    hide("btn_stop");
+    show("btn_start");
+
+}
+
+function randomInteger(min, max) {
+    let rand = min + Math.random() * (max + 1 - min);
+    return Math.floor(rand);
+}
+
+function reload_anim() {
+    document.getElementById("controls_info").innerHTML = "Reload";
+    toStorage('Reload');
+    cont.clearRect(0, 0, window.innerWidth, window.innerHeight)
+    x = r;
+    y = r;
+    dx = randomInteger(1, 4);
+    dy = randomInteger(1, 4);
+    drawBall(x, y);
+    stop = true;
+    hide("btn_reload");
+    show("btn_start");
+    ball_out = false
+}
+
+function close_work() {
+    hide("canvas");
+    hide("work");
+    document.getElementById("controls_info").innerHTML = 'Заховано work';
+    toStorage('Заховано work');
+    let key_array = []
+    let myMap = new Map();
+    for (let i = 0, len = localStorage.length; i < len; i++) {
+        let key = localStorage.key(i);
+        let value = localStorage[key];
+        myMap.set(key * 1, value);
+        key_array.push(key * 1);
+    }
+    key_array.sort((a, b) => a - b);
+    console.log(myMap)
+    console.log(key_array)
+    document.getElementById("events").innerHTML += "---<b>" + num++ + "</b>---<br>";
+    key_array.forEach(element => {
+        document.getElementById("events").innerHTML += myMap.get(element) + "<br>"
+    });
+}
+</script>
+</body>
+</html>
